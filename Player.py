@@ -13,9 +13,10 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect() #creates hitbox with image dimensions
         self.rect.center = (resolution[0]/2, resolution[1]/2) #sprite spawn location
 
+        #add to sprite groups
         for group in sprite_groups:
             group.add(self)
-            
+
     def move(self, move_speed):
         pressed_keys = pygame.key.get_pressed()
 
