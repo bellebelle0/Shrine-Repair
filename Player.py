@@ -3,7 +3,7 @@ from pygame.locals import *
 
 # player class inherits from pygame.sprite
 class Player(pygame.sprite.Sprite):
-    def __init__(self, resolution):
+    def __init__(self, resolution, sprite_groups):
         super().__init__()
         #TODO: change sprite image
         self.resolution = resolution
@@ -13,6 +13,9 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect() #creates hitbox with image dimensions
         self.rect.center = (resolution[0]/2, resolution[1]/2) #sprite spawn location
 
+        for group in sprite_groups:
+            group.add(self)
+            
     def move(self, move_speed):
         pressed_keys = pygame.key.get_pressed()
 
