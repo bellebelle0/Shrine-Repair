@@ -13,7 +13,7 @@ SCREEN_HEIGHT = 480
 RESOLUTION = (SCREEN_WIDTH, SCREEN_HEIGHT)
 
 #TODO: update with proper bg
-background = pygame.image.load("pfad\Group Assignment\Shrine-Repair.jpg")
+background = pygame.image.load("Shrine-Repair.jpg")
 
 display = pygame.display.set_mode(RESOLUTION)
 pygame.display.set_caption("Shrine Repair")
