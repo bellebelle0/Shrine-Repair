@@ -17,29 +17,51 @@ class Player(pygame.sprite.Sprite):
         for group in sprite_groups:
             group.add(self)
 
-    def move(self, move_speed):
+    #TODO: update for diff modes
+    def move(self, move_speed, mode):
         pressed_keys = pygame.key.get_pressed()
 
-        # move up
-        # TODO: change top
-        if self.rect.top > 210:
-            if pressed_keys[K_UP]:
-                self.rect.move_ip(0, -move_speed)
+        if mode == "home":
+            # move up
+            if self.rect.top > 210:
+                if pressed_keys[K_UP]:
+                    self.rect.move_ip(0, -move_speed)
 
-        # move down
-        if self.rect.bottom < self.resolution[1]:
-            if pressed_keys[K_DOWN]:
-                self.rect.move_ip(0, move_speed)
+            # move down
+            if self.rect.bottom < self.resolution[1]:
+                if pressed_keys[K_DOWN]:
+                    self.rect.move_ip(0, move_speed)
 
-        #if sprite is not at left edge move left
-        if self.rect.left > 0:
-            if pressed_keys[K_LEFT]:
-                self.rect.move_ip(-move_speed, 0)
+            #if sprite is not at left edge move left
+            if self.rect.left > 84:
+                if pressed_keys[K_LEFT]:
+                    self.rect.move_ip(-move_speed, 0)
 
-        #move right
-        if self.rect.right < self.resolution[0]:       
-          if pressed_keys[K_RIGHT]:
-              self.rect.move_ip(move_speed, 0)
+            #move right
+            if self.rect.right < self.resolution[0]:       
+                if pressed_keys[K_RIGHT]:
+                    self.rect.move_ip(move_speed, 0)
+        else:
+            # move up
+            if self.rect.top > 0:
+                if pressed_keys[K_UP]:
+                    self.rect.move_ip(0, -move_speed)
+
+            # move down
+            if self.rect.bottom < self.resolution[1]:
+                if pressed_keys[K_DOWN]:
+                    self.rect.move_ip(0, move_speed)
+
+            #if sprite is not at left edge move left
+            if self.rect.left > 0:
+                if pressed_keys[K_LEFT]:
+                    self.rect.move_ip(-move_speed, 0)
+
+            #move right
+            if self.rect.right < self.resolution[0]:       
+                if pressed_keys[K_RIGHT]:
+                    self.rect.move_ip(move_speed, 0)
+
 
     def spawn(self, spawn_point):
         self.rect.center = spawn_point

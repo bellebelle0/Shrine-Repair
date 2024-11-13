@@ -77,13 +77,14 @@ def main():
             display.blit(sprite.image, sprite.rect)
 
         #update
-        player.move(5)
+        player.move(5, current_mode)
         # update game mode if player rect collides with game rect
         #TODO: HINT change here
-        if dance_game_entry.colliderect(player.rect):
-            current_mode = "dance game"
-        elif shop_game_entry.colliderect(player.rect):
-            current_mode = "shop game"
+        if current_mode == "home":
+            if dance_game_entry.colliderect(player.rect):
+                current_mode = "dance game"
+            elif shop_game_entry.colliderect(player.rect):
+                current_mode = "shop game"
 
         pygame.display.update()
         fps_clock.tick(fps)
