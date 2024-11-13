@@ -11,7 +11,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.image.load("Draft/player-sprite.png")
         self.image = pygame.transform.scale_by(self.image, 0.23)
         self.rect = self.image.get_rect() #creates hitbox with image dimensions
-        self.rect.center = (resolution[0]/2, resolution[1]/2) #sprite spawn location
+        self.rect.center = (resolution[0]/2, 480) #sprite spawn location
 
         #add to sprite groups
         for group in sprite_groups:
@@ -21,7 +21,8 @@ class Player(pygame.sprite.Sprite):
         pressed_keys = pygame.key.get_pressed()
 
         # move up
-        if self.rect.top > 0:
+        # TODO: change top
+        if self.rect.top > 210:
             if pressed_keys[K_UP]:
                 self.rect.move_ip(0, -move_speed)
 
@@ -39,3 +40,6 @@ class Player(pygame.sprite.Sprite):
         if self.rect.right < self.resolution[0]:       
           if pressed_keys[K_RIGHT]:
               self.rect.move_ip(move_speed, 0)
+
+    def spawn(self, spawn_point):
+        self.rect.center = spawn_point
