@@ -23,7 +23,9 @@ SCREEN_HEIGHT = 480
 RESOLUTION = (SCREEN_WIDTH, SCREEN_HEIGHT)
 
 #TODO: update with proper bg
-background = pygame.image.load("placeholder_assets/Sky_Paint1.png")
+background = pygame.image.load("Draft/home-old.jpg")
+background = pygame.transform.scale(background, (640, 480))
+
 
 display = pygame.display.set_mode(RESOLUTION)
 pygame.display.set_caption("Shrine Repair")

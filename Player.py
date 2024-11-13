@@ -8,8 +8,8 @@ class Player(pygame.sprite.Sprite):
         #TODO: change sprite image
         self.resolution = resolution
         # initiate sprite
-        self.image = pygame.image.load("placeholder_assets/Sprout Lands - Sprites - Basic pack/Characters/sprite1.png")
-        pygame.transform.scale2x(self.image)
+        self.image = pygame.image.load("Draft/player-sprite.png")
+        self.image = pygame.transform.scale_by(self.image, 0.23)
         self.rect = self.image.get_rect() #creates hitbox with image dimensions
         self.rect.center = (resolution[0]/2, resolution[1]/2) #sprite spawn location
 
