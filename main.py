@@ -50,6 +50,7 @@ all_sprites = pygame.sprite.Group()
 async def home_mode():
     #initialize mode
     current_mode = "home"
+    #TODO: fix
     home_player = Player(RESOLUTION, (RESOLUTION[0]/2, 480), [all_sprites])
     display.blit(home_old.background, (0,0))
     
@@ -70,6 +71,7 @@ async def home_mode():
 
 async def dance_game():
     current_mode = "dance game"
+    #TODO: fix
     dance_player = Player(RESOLUTION, (300, 300), [all_sprites])
 
     while True:
