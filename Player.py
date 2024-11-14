@@ -3,7 +3,7 @@ from pygame.locals import *
 
 # player class inherits from pygame.sprite
 class Player(pygame.sprite.Sprite):
-    def __init__(self, resolution, sprite_groups):
+    def __init__(self, resolution, spawn_point, sprite_groups):
         super().__init__()
         #TODO: change sprite image
         self.resolution = resolution
@@ -11,7 +11,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.image.load("Draft/player-sprite.png")
         self.image = pygame.transform.scale_by(self.image, 0.23)
         self.rect = self.image.get_rect() #creates hitbox with image dimensions
-        self.rect.center = (resolution[0]/2, 480) #sprite spawn location
+        self.rect.center = spawn_point #sprite spawn location
 
         #add to sprite groups
         for group in sprite_groups:
