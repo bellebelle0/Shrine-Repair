@@ -7,8 +7,6 @@ import asyncio
 import time
 
 #TODO: create multiple scenes for diff rooms
-#TODO: function to initiate all sprites
-#TODO: async function to load game modes
 
 #initialize pygame engine
 pygame.init()
@@ -43,101 +41,141 @@ pygame.display.set_caption("Shrine Repair")
 #initiate sprite groups
 all_sprites = pygame.sprite.Group()
 
-# #initiate sprites
-# home_player = Player(RESOLUTION, (RESOLUTION[0]/2, 480), [all_sprites])
+#initiate sprites
+#TODO: HINT change here
+home_player = Player(RESOLUTION, (RESOLUTION[0]/2, 480), [all_sprites], "Draft/player-sprite.png")
+dance_player = Player(RESOLUTION, (300, 300), [all_sprites], "Draft/dance_sprite.png")
+shop_player = Player(RESOLUTION, (300, 300), [all_sprites], "Draft/shop_game_sprite.png")
 
-### game mode functions ###
-async def home_mode():
+### game modes ###
+# home mode gameplay loop
+def home_mode():
     #initialize mode
-    current_mode = "home"
-    #TODO: fix
-    home_player = Player(RESOLUTION, (RESOLUTION[0]/2, 480), [all_sprites])
     display.blit(home_old.background, (0,0))
-    
-    home_player.move(5, current_mode)
+    home_player.move(5, "home")
     display.blit(home_player.image, home_player.rect)
-    # #load sprites
-    # for sprite in all_sprites:
-    #     display.blit(sprite.image, sprite.rect)
 
     pygame.display.update()
     fps_clock.tick(fps)
 
-    #check for game mode change
-    if dance_game_entry.colliderect(home_player.rect):
-        return "dance game"
-    elif shop_game_entry.colliderect(home_player.rect):
-        return "shop game"
+# dance mode gameplay loop
+#TODO: update
+def dance_game():
+    #TODO: change to button exit after minigame finish or auto finish
+    display.blit(dance_scene.background, (0,0))
+    dance_player.move(5, "dance game")
+    display.blit(dance_player.image, dance_player.rect)
 
-async def dance_game():
-    current_mode = "dance game"
-    #TODO: fix
-    dance_player = Player(RESOLUTION, (300, 300), [all_sprites])
+    pygame.display.update()
+    fps_clock.tick(fps)
 
-    while True:
-        display.blit(dance_scene.background, (0,0))
-        #TODO: change the player according to game mode
-        dance_player.move(5, current_mode)
+# shop mode gameplay loop          
+def shop_game():
+    #TODO: change to button exit after minigame finish or auto finish
+    display.blit(shop_scene.background, (0,0))
+    shop_player.move(5, "shop game")
+    display.blit(shop_player.image, shop_player.rect)
 
-        for sprite in all_sprites:
-            display.blit(sprite.image, sprite.rect)
+    pygame.display.update()
+    fps_clock.tick(fps)
 
-        pygame.display.update()
-        fps_clock.tick(fps)
-            
 ### game update loop ###
-
-async def main():
+def main():
+    current_mode = "home"
     while True:
-        #quit game 
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
-        change_mode = await home_mode()
-        print(change_mode)
+        # start game in home loop
+        if current_mode == "home":
+            home_player.spawn()
+            while True:
+                #check for quit
+                for event in pygame.event.get():
+                    if event.type == QUIT:
+                        pygame.quit()
+                        sys.exit()
 
-        if change_mode == "dance game":
-            time.sleep(1)
-            await dance_game()
-        
-    
+                home_mode()
+
+                # update game mode if player rect collides with game rect
+                #TODO: HINT change here
+                if dance_game_entry.colliderect(home_player.rect):
+                    current_mode = "dance game"
+                    break
+                elif shop_game_entry.colliderect(home_player.rect):
+                    current_mode = "shop game"
+                    break
+
+        # enter dance game loop
+        if current_mode == "dance game":
+            while True:
+                #check for quit
+                for event in pygame.event.get():
+                    if event.type == QUIT:
+                        pygame.quit()
+                        sys.exit()
+
+                dance_game()
+                
+                exit_rect = pygame.Rect(200, 380, 100, 100)
+                if exit_rect.colliderect(dance_player.rect):
+                    # return to home loop after finishing minigame
+                    current_mode = "home"
+                    break
+
+        # enter shop game loop
+        if current_mode == "shop game":
+            while True:
+                #check for quit
+                for event in pygame.event.get():
+                    if event.type == QUIT:
+                        pygame.quit()
+                        sys.exit()
+
+                shop_game()
+
+                exit_rect = pygame.Rect(200, 380, 100, 100)
+                if exit_rect.colliderect(shop_player.rect):
+                    # return to home loop after finishing minigame
+                    current_mode = "home"
+                    break
+
+
 
 
 # def main():
-#     current_mode = "home"
+#     while True:
+#         #quit game 
+#         i = 0 
+#         for event in pygame.event.get():
+#             if event.type == QUIT:
+#                 pygame.quit()
+#                 sys.exit()
+#             if event.type == PLAY_MINIGAME:
+#                 if event.mode == 'dance':
+#                     print("dance game" + str(time.time()))
+#                     dance_game()
+#                     # display.blit(dance_scene.background, (0,0))
+#                     i+=1
+
+#         change_mode = home_mode()
+        # print(change_mode)
+
+        # if change_mode == "dance game":
+        #     dance_game()
+
+
+# async def main():
 #     while True:
 #         #quit game 
 #         for event in pygame.event.get():
 #             if event.type == QUIT:
 #                 pygame.quit()
 #                 sys.exit()
+#         change_mode = await home_mode()
+#         print(change_mode)
 
-#         #change background based on game mode
-#         #TODO: HINT change here
-#         if current_mode == "home":
-#             display.blit(home_old.background, (0,0))
-#         elif current_mode == "dance game":
-#             display.blit(dance_scene.background, (0,0))
-#         elif current_mode == "shop game":
-#             display.blit(shop_scene.background, (0,0))
-
-#         #load sprites
-#         for sprite in all_sprites:
-#             display.blit(sprite.image, sprite.rect)
-
-#         #update
-#         player.move(5, current_mode)
-#         # update game mode if player rect collides with game rect
-#         #TODO: HINT change here
-#         if current_mode == "home":
-#             if dance_game_entry.colliderect(player.rect):
-#                 current_mode = "dance game"
-#             elif shop_game_entry.colliderect(player.rect):
-#                 current_mode = "shop game"
-
-#         pygame.display.update()
-#         fps_clock.tick(fps)
+#         if change_mode == "dance game":
+#             await dance_game()
+        
 
 
 #main():
@@ -152,5 +190,5 @@ async def main():
 # else pass
 
 if __name__ == '__main__':
-    # main()
-    asyncio.run(main())
+    main()
+    # asyncio.run(main())
