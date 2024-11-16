@@ -3,10 +3,9 @@ import pygame
 from pygame.locals import *
 from Player import Player
 from Scene import Scene
-import asyncio
-import time
+from DanceSpotlight import DanceSpotlight
 
-#TODO: create multiple scenes for diff rooms
+#TODO: add flag for completion of minigames
 
 #initialize pygame engine
 pygame.init()
@@ -16,9 +15,18 @@ pygame.init()
 fps = 60
 fps_clock = pygame.time.Clock()
 
+# display config
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 RESOLUTION = (SCREEN_WIDTH, SCREEN_HEIGHT)
+
+#font config
+font = pygame.font.SysFont("Verdana", 60)
+
+# color config
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
 
 # load all scenes
 home_old = Scene(RESOLUTION, "Draft/home-old.jpg")
@@ -44,8 +52,13 @@ all_sprites = pygame.sprite.Group()
 #initiate sprites
 #TODO: HINT change here
 home_player = Player(RESOLUTION, (RESOLUTION[0]/2, 480), [all_sprites], "Draft/player-sprite.png")
-dance_player = Player(RESOLUTION, (300, 300), [all_sprites], "Draft/dance_sprite.png")
+dance_player = Player(RESOLUTION, (0, 255), [all_sprites], "Draft/dance_sprite.png")
 shop_player = Player(RESOLUTION, (300, 300), [all_sprites], "Draft/shop_game_sprite.png")
+
+# define score incrementing event for minigames
+# temp timer event to increment score
+SCORE_UP = pygame.USEREVENT + 1 # create new user defined event
+SPOTLIGHT_TIMER = pygame.USEREVENT + 2
 
 ### game modes ###
 # home mode gameplay loop
@@ -59,15 +72,46 @@ def home_mode():
     fps_clock.tick(fps)
 
 # dance mode gameplay loop
-#TODO: update
-def dance_game():
-    #TODO: change to button exit after minigame finish or auto finish
+#TODO: clean up logic
+def dance_game(score, spotlight, live_spotlight):
+    #show score in corner and draw bg
+    score_text = f"Score: {score}"
+    score_display = font.render(score_text, True, RED)
     display.blit(dance_scene.background, (0,0))
-    dance_player.move(5, "dance game")
-    display.blit(dance_player.image, dance_player.rect)
+    display.blit(score_display, (24, 24))
+
+    #variable to hold spotlight status
+    spotlight_status = live_spotlight
+    #if a spotlight is currently live
+    if live_spotlight:
+        #draw spotlight and player
+        display.blit(spotlight.image, spotlight.rect)
+        dance_player.move(5, "dance game")
+        display.blit(dance_player.image, dance_player.rect)
+
+        #add score when player reaches spotlight and kill spotlight
+        if dance_player.rect.colliderect(spotlight.rect):
+            spotlight.kill()
+            inc_score = pygame.event.Event(SCORE_UP)
+            pygame.event.post(inc_score)
+            spotlight_status = False
+
+    #if spotlight is not live
+    else:
+        #kill it to prevent the sprite rect from being created
+        spotlight.kill()
+        spotlight_status = False
+
+        dance_player.move(5, "dance game")
+        display.blit(dance_player.image, dance_player.rect)
+
 
     pygame.display.update()
     fps_clock.tick(fps)
+
+    return spotlight_status
+
+
 
 # shop mode gameplay loop          
 def shop_game():
@@ -106,20 +150,32 @@ def main():
 
         # enter dance game loop
         if current_mode == "dance game":
-            while True:
-                #check for quit
+            #create a spotlight instance
+            spotlight = DanceSpotlight()
+            #respawn the spotlight every second
+            pygame.time.set_timer(SPOTLIGHT_TIMER, 1000)
+            live_spotlight = False
+            score = 0
+            while score < 10:
+
                 for event in pygame.event.get():
+                    #check for quit
                     if event.type == QUIT:
                         pygame.quit()
                         sys.exit()
+                    #check for increase in score
+                    if event.type == SCORE_UP:
+                        score += 1
+                    #check for event to spawn spot
+                    if event.type == SPOTLIGHT_TIMER:
+                        live_spotlight = True
+                        spotlight.spawn()
+                        
+                #update spotlight status
+                live_spotlight = dance_game(score, spotlight, live_spotlight)
 
-                dance_game()
-                
-                exit_rect = pygame.Rect(200, 380, 100, 100)
-                if exit_rect.colliderect(dance_player.rect):
-                    # return to home loop after finishing minigame
-                    current_mode = "home"
-                    break
+            # return to home mode after minigame
+            current_mode = "home"
 
         # enter shop game loop
         if current_mode == "shop game":
@@ -138,46 +194,6 @@ def main():
                     current_mode = "home"
                     break
 
-
-
-
-# def main():
-#     while True:
-#         #quit game 
-#         i = 0 
-#         for event in pygame.event.get():
-#             if event.type == QUIT:
-#                 pygame.quit()
-#                 sys.exit()
-#             if event.type == PLAY_MINIGAME:
-#                 if event.mode == 'dance':
-#                     print("dance game" + str(time.time()))
-#                     dance_game()
-#                     # display.blit(dance_scene.background, (0,0))
-#                     i+=1
-
-#         change_mode = home_mode()
-        # print(change_mode)
-
-        # if change_mode == "dance game":
-        #     dance_game()
-
-
-# async def main():
-#     while True:
-#         #quit game 
-#         for event in pygame.event.get():
-#             if event.type == QUIT:
-#                 pygame.quit()
-#                 sys.exit()
-#         change_mode = await home_mode()
-#         print(change_mode)
-
-#         if change_mode == "dance game":
-#             await dance_game()
-        
-
-
 #main():
 # load home map
 # current mode = home
@@ -191,4 +207,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # asyncio.run(main())

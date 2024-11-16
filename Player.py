@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite):
         for group in sprite_groups:
             group.add(self)
 
-    #TODO: update for diff modes
+    #TODO: update for diff modes, all games limited to horizontal movement
     def move(self, move_speed, mode):
         pressed_keys = pygame.key.get_pressed()
 
@@ -44,18 +44,9 @@ class Player(pygame.sprite.Sprite):
                     self.rect.move_ip(move_speed, 0)
 
         elif mode == "dance game":
-            # move up
-            if self.rect.top > 210:
-                if pressed_keys[K_UP]:
-                    self.rect.move_ip(0, -move_speed)
 
-            # move down
-            if self.rect.bottom < self.resolution[1]:
-                if pressed_keys[K_DOWN]:
-                    self.rect.move_ip(0, move_speed)
-
-            #if sprite is not at left edge move left
-            if self.rect.left > 84:
+            #move left
+            if self.rect.left > 0: #if sprite is not at left edge move left
                 if pressed_keys[K_LEFT]:
                     self.rect.move_ip(-move_speed, 0)
 
@@ -63,7 +54,7 @@ class Player(pygame.sprite.Sprite):
             if self.rect.right < self.resolution[0]:       
                 if pressed_keys[K_RIGHT]:
                     self.rect.move_ip(move_speed, 0)
-                    
+
         else:
             # move up
             if self.rect.top > 0:
@@ -85,6 +76,6 @@ class Player(pygame.sprite.Sprite):
                 if pressed_keys[K_RIGHT]:
                     self.rect.move_ip(move_speed, 0)
 
-
+    # reset player position
     def spawn(self):
         self.rect.center = self.respawn_point
