@@ -86,7 +86,7 @@ def dance_game(score, spotlight, live_spotlight):
     if live_spotlight:
         #draw spotlight and player
         display.blit(spotlight.image, spotlight.rect)
-        dance_player.move(5, "dance game")
+        dance_player.move(move_speed=5, mode="dance game")
         display.blit(dance_player.image, dance_player.rect)
 
         #add score when player reaches spotlight and kill spotlight
@@ -193,6 +193,19 @@ def main():
                     # return to home loop after finishing minigame
                     current_mode = "home"
                     break
+            
+        if current_mode == "sort game":
+            while True:
+                #check for quit
+                for event in pygame.event.get():
+                    if event.type == QUIT:
+                        pygame.quit()
+                        sys.exit()
+
+            #TODO: put sort game function here
+
+            # return to home mode after minigame
+            current_mode = "home"
 
 #main():
 # load home map
