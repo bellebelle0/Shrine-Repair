@@ -57,18 +57,26 @@ home_player = Player(RESOLUTION, (RESOLUTION[0]/2, 480), [all_sprites], "Draft/p
 dance_player = Player(RESOLUTION, (0, 255), [all_sprites], "Draft/dance_sprite.png")
 shop_player = Player(RESOLUTION, (320, 400), [all_sprites], "Draft/shop_game_sprite.png")
 
-# define score incrementing event for minigames
+# minigame events
 SCORE_UP = pygame.USEREVENT + 1 # create new user defined event
 GAMEPLAY_TIMER = pygame.USEREVENT + 2
-# temp timer event to increment score
-SCORE_TIMER = pygame.USEREVENT + 3
 
+dance_flag = False
+shop_flag = False
+sort_flag = False
+completion_status = False
 
 ### game modes ###
 # home mode gameplay loop
 def home_mode():
-    #initialize mode
-    display.blit(home_old.background, (0,0))
+    # if all games have been completed draw new bg
+    if completion_status:
+        display.blit(home_new.background, (0,0))
+    else:
+        # draw old bg
+        display.blit(home_old.background, (0,0))
+        
+    #move and draw player
     home_player.move(5, "home")
     display.blit(home_player.image, home_player.rect)
 
@@ -96,7 +104,8 @@ def dance_game(score, spotlight, live_spotlight):
         #add score when player reaches spotlight and kill spotlight
         if dance_player.rect.colliderect(spotlight.rect):
             spotlight.kill()
-            inc_score = pygame.event.Event(SCORE_UP)
+            # indicate that a SCORE_UP event has occured
+            inc_score = pygame.event.Event(SCORE_UP) 
             pygame.event.post(inc_score)
             spotlight_status = False
 
@@ -115,8 +124,6 @@ def dance_game(score, spotlight, live_spotlight):
 
     return spotlight_status
 
-
-
 # shop mode gameplay loop          
 def shop_game(score, item_group):
     #show score in corner and draw bg
@@ -126,18 +133,17 @@ def shop_game(score, item_group):
     display.blit(score_display, (24, 24))
     shop_player.move(5, "shop game")
     
-    #if item is currently live
+    #for each item created
     for item in item_group:
-        #draw and move item and player
+        #draw and move item
         item.move()
         display.blit(item.image, item.rect)
 
-        #add score when player reaches spotlight and kill spotlight
+        #add score when player collides with item
         if shop_player.rect.colliderect(item.rect):
             item.kill()
             inc_score = pygame.event.Event(SCORE_UP)
             pygame.event.post(inc_score)
-            item_status = False 
 
     display.blit(shop_player.image, shop_player.rect)
 
@@ -198,6 +204,8 @@ def main():
                 #update spotlight status
                 live_spotlight = dance_game(score, spotlight, live_spotlight)
 
+            # update dance completion status
+            dance_flag = True
             # return to home mode after minigame
             current_mode = "home"
 
@@ -219,12 +227,16 @@ def main():
                     if event.type == SCORE_UP:
                         score += 1
 
+                    #create a new shop item every second
                     if event.type == GAMEPLAY_TIMER:
-                            item_group.add(ShopItem())
-                            print(item_group)
+                        item_group.add(ShopItem())
+                        print(item_group)
 
                 shop_game(score, item_group)
 
+            # update dance completion status
+            shop_flag = True
+            # return to home mode after minigame
             current_mode = "home"
             
         if current_mode == "sort game":
