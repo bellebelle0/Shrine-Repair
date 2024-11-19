@@ -57,16 +57,6 @@ class Player(pygame.sprite.Sprite):
                     self.rect.move_ip(move_speed, 0)
 
         else:
-            # move up
-            if self.rect.top > 0:
-                if pressed_keys[K_UP]:
-                    self.rect.move_ip(0, -move_speed)
-
-            # move down
-            if self.rect.bottom < self.resolution[1]:
-                if pressed_keys[K_DOWN]:
-                    self.rect.move_ip(0, move_speed)
-
             #if sprite is not at left edge move left
             if self.rect.left > 0:
                 if pressed_keys[K_LEFT]:

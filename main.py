@@ -53,12 +53,14 @@ all_sprites = pygame.sprite.Group()
 #TODO: HINT change here
 home_player = Player(RESOLUTION, (RESOLUTION[0]/2, 480), [all_sprites], "Draft/player-sprite.png")
 dance_player = Player(RESOLUTION, (0, 255), [all_sprites], "Draft/dance_sprite.png")
-shop_player = Player(RESOLUTION, (300, 300), [all_sprites], "Draft/shop_game_sprite.png")
+shop_player = Player(RESOLUTION, (320, 400), [all_sprites], "Draft/shop_game_sprite.png")
 
 # define score incrementing event for minigames
-# temp timer event to increment score
 SCORE_UP = pygame.USEREVENT + 1 # create new user defined event
 SPOTLIGHT_TIMER = pygame.USEREVENT + 2
+# temp timer event to increment score
+SCORE_TIMER = pygame.USEREVENT + 3
+
 
 ### game modes ###
 # home mode gameplay loop
@@ -114,9 +116,13 @@ def dance_game(score, spotlight, live_spotlight):
 
 
 # shop mode gameplay loop          
-def shop_game():
-    #TODO: change to button exit after minigame finish or auto finish
+def shop_game(score):
+    #show score in corner and draw bg
+    score_text = f"Score: {score}"
+    score_display = font.render(score_text, True, RED)
     display.blit(shop_scene.background, (0,0))
+    display.blit(score_display, (24, 24))
+
     shop_player.move(5, "shop game")
     display.blit(shop_player.image, shop_player.rect)
 
@@ -157,15 +163,16 @@ def main():
             live_spotlight = False
             score = 0
             while score < 10:
-
                 for event in pygame.event.get():
                     #check for quit
                     if event.type == QUIT:
                         pygame.quit()
                         sys.exit()
+
                     #check for increase in score
                     if event.type == SCORE_UP:
                         score += 1
+
                     #check for event to spawn spot
                     if event.type == SPOTLIGHT_TIMER:
                         live_spotlight = True
@@ -179,20 +186,22 @@ def main():
 
         # enter shop game loop
         if current_mode == "shop game":
-            while True:
+            score = 0
+            pygame.time.set_timer(SCORE_TIMER, 1000)
+            while score < 10:
                 #check for quit
                 for event in pygame.event.get():
                     if event.type == QUIT:
                         pygame.quit()
                         sys.exit()
 
-                shop_game()
+                    #check for increase in score
+                    if event.type == SCORE_TIMER:
+                        score += 1
 
-                exit_rect = pygame.Rect(200, 380, 100, 100)
-                if exit_rect.colliderect(shop_player.rect):
-                    # return to home loop after finishing minigame
-                    current_mode = "home"
-                    break
+                shop_game(score)
+
+            current_mode = "home"
             
         if current_mode == "sort game":
             while True:
