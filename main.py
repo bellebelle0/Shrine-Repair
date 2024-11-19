@@ -4,6 +4,7 @@ from pygame.locals import *
 from Player import Player
 from Scene import Scene
 from DanceSpotlight import DanceSpotlight
+from ShopItem import ShopItem
 
 #TODO: add flag for completion of minigames
 
@@ -43,6 +44,7 @@ scene_entries.append(dance_game_entry)
 shop_game_entry = pygame.Rect((0, 84, 84, 161))
 scene_entries.append(shop_game_entry)
 
+#configure display window
 display = pygame.display.set_mode(RESOLUTION)
 pygame.display.set_caption("Shrine Repair")
 
@@ -57,7 +59,7 @@ shop_player = Player(RESOLUTION, (320, 400), [all_sprites], "Draft/shop_game_spr
 
 # define score incrementing event for minigames
 SCORE_UP = pygame.USEREVENT + 1 # create new user defined event
-SPOTLIGHT_TIMER = pygame.USEREVENT + 2
+GAMEPLAY_TIMER = pygame.USEREVENT + 2
 # temp timer event to increment score
 SCORE_TIMER = pygame.USEREVENT + 3
 
@@ -116,18 +118,32 @@ def dance_game(score, spotlight, live_spotlight):
 
 
 # shop mode gameplay loop          
-def shop_game(score):
+def shop_game(score, item_group):
     #show score in corner and draw bg
     score_text = f"Score: {score}"
     score_display = font.render(score_text, True, RED)
     display.blit(shop_scene.background, (0,0))
     display.blit(score_display, (24, 24))
-
     shop_player.move(5, "shop game")
+    
+    #if item is currently live
+    for item in item_group:
+        #draw and move item and player
+        item.move()
+        display.blit(item.image, item.rect)
+
+        #add score when player reaches spotlight and kill spotlight
+        if shop_player.rect.colliderect(item.rect):
+            item.kill()
+            inc_score = pygame.event.Event(SCORE_UP)
+            pygame.event.post(inc_score)
+            item_status = False 
+
     display.blit(shop_player.image, shop_player.rect)
 
     pygame.display.update()
     fps_clock.tick(fps)
+
 
 ### game update loop ###
 def main():
@@ -159,8 +175,9 @@ def main():
             #create a spotlight instance
             spotlight = DanceSpotlight()
             #respawn the spotlight every second
-            pygame.time.set_timer(SPOTLIGHT_TIMER, 1000)
+            pygame.time.set_timer(GAMEPLAY_TIMER, 1000)
             live_spotlight = False
+
             score = 0
             while score < 10:
                 for event in pygame.event.get():
@@ -174,7 +191,7 @@ def main():
                         score += 1
 
                     #check for event to spawn spot
-                    if event.type == SPOTLIGHT_TIMER:
+                    if event.type == GAMEPLAY_TIMER:
                         live_spotlight = True
                         spotlight.spawn()
                         
@@ -186,8 +203,11 @@ def main():
 
         # enter shop game loop
         if current_mode == "shop game":
+            #sprite group to hold items
+            item_group = pygame.sprite.Group()
+            pygame.time.set_timer(GAMEPLAY_TIMER, 1000)
+
             score = 0
-            pygame.time.set_timer(SCORE_TIMER, 1000)
             while score < 10:
                 #check for quit
                 for event in pygame.event.get():
@@ -196,10 +216,14 @@ def main():
                         sys.exit()
 
                     #check for increase in score
-                    if event.type == SCORE_TIMER:
+                    if event.type == SCORE_UP:
                         score += 1
 
-                shop_game(score)
+                    if event.type == GAMEPLAY_TIMER:
+                            item_group.add(ShopItem())
+                            print(item_group)
+
+                shop_game(score, item_group)
 
             current_mode = "home"
             
