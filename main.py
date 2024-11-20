@@ -43,6 +43,8 @@ dance_game_entry = pygame.Rect((154.1, 0, 300.1, 211)) #(left top x, left top y,
 scene_entries.append(dance_game_entry)
 shop_game_entry = pygame.Rect((0, 84, 84, 161))
 scene_entries.append(shop_game_entry)
+sorting_game_entry = pygame.Rect((444, 0, 184, 218))
+scene_entries.append(sorting_game_entry)
 
 #configure display window
 display = pygame.display.set_mode(RESOLUTION)
@@ -56,6 +58,7 @@ all_sprites = pygame.sprite.Group()
 home_player = Player(RESOLUTION, (RESOLUTION[0]/2, 480), [all_sprites], "Draft/player-sprite.png")
 dance_player = Player(RESOLUTION, (0, 255), [all_sprites], "Draft/dance_sprite.png")
 shop_player = Player(RESOLUTION, (320, 400), [all_sprites], "Draft/shop_game_sprite.png")
+sorting_player = Player(RESOLUTION, (320, 400), [all_sprites], "sorting_game_sprite.jpg")
 
 # minigame events
 SCORE_UP = pygame.USEREVENT + 1 # create new user defined event
