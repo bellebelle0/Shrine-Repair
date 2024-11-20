@@ -177,6 +177,8 @@ def main():
                     break
                 elif shop_game_entry.colliderect(home_player.rect):
                     current_mode = "shop game"
+                elif sorting_game_entry.colliderect(home_player.rect): 
+                    current_mode = "sort game"
                     break
 
         # enter dance game loop
