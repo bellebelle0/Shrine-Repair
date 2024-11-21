@@ -1,5 +1,6 @@
 import sys
 import pygame
+import random
 from pygame.locals import *
 from Player import Player
 from Scene import Scene
@@ -23,6 +24,7 @@ RESOLUTION = (SCREEN_WIDTH, SCREEN_HEIGHT)
 
 #font config
 font = pygame.font.SysFont("Verdana", 60)
+small_font = pygame.font.SysFont("Verdana", 24)
 
 # color config
 BLACK = (0, 0, 0)
@@ -153,6 +155,45 @@ def shop_game(score, item_group):
     pygame.display.update()
     fps_clock.tick(fps)
 
+# QA game logic
+def sort_game(current_question, score, question_status):
+    # Draw background and score
+    display.blit(sorting_scene.background, (0, 0))
+    score_text = f"Score: {score}"
+    score_display = small_font.render(score_text, True, RED)
+    display.blit(score_display, (24, 24))
+    
+    #  question
+    question_display = small_font.render(current_question["question"], True, BLACK)
+    display.blit(question_display, (24, 60))
+
+    user_answer = ''
+    # Handle user input for True/False
+    if question_status == True:
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_t:  # 'T' for True
+                    user_answer = 'True'
+                elif event.key == K_f:  # 'F' for False
+                    user_answer = 'False'
+                    
+    # check user input correct or not
+    if not len(user_answer) == 0:
+        if user_answer == current_question["answer"]:
+            print("Correct!")
+            inc_score = pygame.event.Event(SCORE_UP) 
+            pygame.event.post(inc_score)
+            question_status = False
+        else:
+            print(f"Incorrect! The correct answer was {current_question['answer']}.")
+            question_status = False
+    
+
+    pygame.display.update()
+    fps_clock.tick(fps)
+
+    return question_status
+
 
 ### game update loop ###
 def main():
@@ -245,15 +286,58 @@ def main():
             current_mode = "home"
             
         if current_mode == "sort game":
-            while True:
+            # Questions and Answers Database
+            qa_data = [
+                {"question": "Is the main deity of Japanese shrines referred to as 'Kami'?", "answer": 'True'},
+                {"question": "Are Komainu in shrines regarded as decorations rather than guardians?", "answer": 'False'},
+                {"question": "Is the traditional Japanese festival 'Hatsuha' held on New Year's Day, January 1st?", "answer": 'True'},
+                {"question": "Does the 'Torii' in a shrine symbolize the connection between humans and gods?", "answer": 'True'},
+                {"question": "Are harvest festivals and Shichi-Go-San unrelated to Japanese shrines?", "answer": 'False'},
+                {"question": "Are common offerings in shrines limited to money and flowers?", "answer": 'False'},
+            ]
+            asked_questions = []
+            # Randomly select a question that hasn't been asked
+            question_index = random.choice([i for i in range(len(qa_data)) if i not in asked_questions])
+            current_question = qa_data[question_index]
+            asked_questions.append(question_index)
+
+            #track question status and score
+            question_status = True
+            score=0
+            while len(asked_questions) <= len(qa_data):
                 #check for quit
                 for event in pygame.event.get():
                     if event.type == QUIT:
                         pygame.quit()
                         sys.exit()
+                    if event.type == SCORE_UP:
+                        score += 1
 
-            #TODO: put sort game function here
+                # if there is an existing question
+                if question_status:
+                    print(current_question)
+                else:
+                    #check if it is the last question
+                    if not len(asked_questions) == len(qa_data):
+                        question_index = random.choice([i for i in range(len(qa_data)) if i not in asked_questions])
+                        current_question = qa_data[question_index]
+                        asked_questions.append(question_index)
+                        question_status = True
+                        print(current_question)
+                    else:
+                        # if last question has been answered or not
+                        if question_status:
+                            continue
+                        else:
+                            break
 
+                question_status = sort_game(current_question, score, question_status)
+
+            if score >= 6:
+                print("Congratulations! You've completed the game.")
+
+            else:
+                print("Game over! Better luck next time.")
             # return to home mode after minigame
             current_mode = "home"
 
