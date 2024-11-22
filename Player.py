@@ -43,19 +43,6 @@ class Player(pygame.sprite.Sprite):
                 if pressed_keys[K_RIGHT]:
                     self.rect.move_ip(move_speed, 0)
 
-        #TODO: copy and change here for different game modes
-        elif mode == "dance game":
-
-            #move left
-            if self.rect.left > 0: #if sprite is not at left edge move left
-                if pressed_keys[K_LEFT]:
-                    self.rect.move_ip(-move_speed, 0)
-
-            #move right
-            if self.rect.right < self.resolution[0]:       
-                if pressed_keys[K_RIGHT]:
-                    self.rect.move_ip(move_speed, 0)
-
         else:
             #if sprite is not at left edge move left
             if self.rect.left > 0:

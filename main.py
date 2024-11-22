@@ -7,7 +7,7 @@ from Scene import Scene
 from DanceSpotlight import DanceSpotlight
 from ShopItem import ShopItem
 
-#TODO: add flag for completion of minigames
+#TODO: refactor
 
 #initialize pygame engine
 pygame.init()
@@ -38,15 +38,6 @@ dance_scene = Scene(RESOLUTION, "Draft/Game1.jpg")
 shop_scene = Scene(RESOLUTION, "Draft/Game2.jpg")
 sorting_scene = Scene(RESOLUTION, "Draft/Game3.jpg")
 
-# scene entry points aka rect
-#TODO: HINT change here
-scene_entries = []
-dance_game_entry = pygame.Rect((154.1, 0, 300.1, 211)) #(left top x, left top y, width, height)
-scene_entries.append(dance_game_entry)
-shop_game_entry = pygame.Rect((0, 84, 84, 161))
-scene_entries.append(shop_game_entry)
-sorting_game_entry = pygame.Rect((444, 0, 184, 218))
-scene_entries.append(sorting_game_entry)
 
 #configure display window
 display = pygame.display.set_mode(RESOLUTION)
@@ -56,11 +47,10 @@ pygame.display.set_caption("Shrine Repair")
 all_sprites = pygame.sprite.Group()
 
 #initiate sprites
-#TODO: HINT change here
 home_player = Player(RESOLUTION, (RESOLUTION[0]/2, 480), [all_sprites], "Draft/player-sprite.png")
 dance_player = Player(RESOLUTION, (0, 255), [all_sprites], "Draft/dance_sprite.png")
 shop_player = Player(RESOLUTION, (320, 400), [all_sprites], "Draft/shop_game_sprite.png")
-sorting_player = Player(RESOLUTION, (320, 400), [all_sprites], "sorting_game_sprite.jpg")
+sorting_player = Player(RESOLUTION, (320, 450), [all_sprites], "Draft/sorting_game_sprite.jpg")
 
 # minigame events
 SCORE_UP = pygame.USEREVENT + 1 # create new user defined event
@@ -70,6 +60,45 @@ dance_flag = False
 shop_flag = False
 sort_flag = False
 completion_status = False
+
+### utility functions ###
+def drawText(surface, text, color, rect, font, aa=False, bkg=None):
+    rect = Rect(rect)
+    y = rect.top
+    lineSpacing = -2
+
+    # get the height of the font
+    fontHeight = font.size("Tg")[1]
+
+    while text:
+        i = 1
+
+        # determine if the row of text will be outside our area
+        if y + fontHeight > rect.bottom:
+            break
+
+        # determine maximum width of line
+        while font.size(text[:i])[0] < rect.width and i < len(text):
+            i += 1
+
+        # if we've wrapped the text, then adjust the wrap to the last word      
+        if i < len(text): 
+            i = text.rfind(" ", 0, i) + 1
+
+        # render the line and blit it to the surface
+        if bkg:
+            image = font.render(text[:i], 1, color, bkg)
+            image.set_colorkey(bkg)
+        else:
+            image = font.render(text[:i], aa, color)
+
+        surface.blit(image, (rect.left, y))
+        y += fontHeight + lineSpacing
+
+        # remove the text we just blitted
+        text = text[i:]
+
+    return text
 
 ### game modes ###
 # home mode gameplay loop
@@ -89,7 +118,6 @@ def home_mode():
     fps_clock.tick(fps)
 
 # dance mode gameplay loop
-#TODO: clean up logic
 def dance_game(score, spotlight, live_spotlight):
     #show score in corner and draw bg
     score_text = f"Score: {score}"
@@ -163,20 +191,29 @@ def sort_game(current_question, score, question_status):
     score_display = small_font.render(score_text, True, RED)
     display.blit(score_display, (24, 24))
     
-    #  question
-    question_display = small_font.render(current_question["question"], True, BLACK)
-    display.blit(question_display, (24, 60))
+    #  question display
+    # question_display = small_font.render(current_question["question"], True, BLACK)
+    # display.blit(question_display, (24, 60))
+    text_display = pygame.Rect((398*.23,240*.23,1800*.23, 864*.23))
+    drawText(display, current_question["question"], BLACK, text_display, small_font)
 
     user_answer = ''
-    # Handle user input for True/False
+
+    # user input true or false by moving
+    true_rect = pygame.Rect((0, 161, SCREEN_WIDTH/3, SCREEN_HEIGHT-161))
+    false_rect = pygame.Rect(((640*2/3), 161, SCREEN_WIDTH/3, SCREEN_HEIGHT-161))
+
+    sorting_player.move(5, "sort game")
+    display.blit(sorting_player.image, sorting_player.rect)
+
     if question_status == True:
-        for event in pygame.event.get():
-            if event.type == KEYDOWN:
-                if event.key == K_t:  # 'T' for True
-                    user_answer = 'True'
-                elif event.key == K_f:  # 'F' for False
-                    user_answer = 'False'
-                    
+        if true_rect.colliderect(sorting_player.rect):
+            user_answer = 'True'
+            sorting_player.spawn()
+        elif false_rect.colliderect(sorting_player.rect):
+            user_answer = 'False'
+            sorting_player.spawn()
+    
     # check user input correct or not
     if not len(user_answer) == 0:
         if user_answer == current_question["answer"]:
@@ -197,8 +234,26 @@ def sort_game(current_question, score, question_status):
 
 ### game update loop ###
 def main():
+    # access completion flags
+    global completion_status
+    global sort_flag, shop_flag, dance_flag
+
     current_mode = "home"
+    # scene entry points aka rect
+    scene_entries = []
+    dance_game_entry = pygame.Rect((154.1, 0, 300.1, 211)) #(left top x, left top y, width, height)
+    scene_entries.append(dance_game_entry)
+    shop_game_entry = pygame.Rect((0, 84, 84, 161))
+    scene_entries.append(shop_game_entry)
+    sorting_game_entry = pygame.Rect((444, 0, 184, 218))
+    scene_entries.append(sorting_game_entry)
+
     while True:
+        #check for minigame completion status
+        if shop_flag and dance_flag and sort_flag:
+            completion_status = True
+        else:
+            completion_status = False
         # start game in home loop
         if current_mode == "home":
             home_player.spawn()
@@ -212,12 +267,12 @@ def main():
                 home_mode()
 
                 # update game mode if player rect collides with game rect
-                #TODO: HINT change here
                 if dance_game_entry.colliderect(home_player.rect):
                     current_mode = "dance game"
                     break
                 elif shop_game_entry.colliderect(home_player.rect):
                     current_mode = "shop game"
+                    break
                 elif sorting_game_entry.colliderect(home_player.rect): 
                     current_mode = "sort game"
                     break
@@ -288,12 +343,12 @@ def main():
         if current_mode == "sort game":
             # Questions and Answers Database
             qa_data = [
-                {"question": "Is the main deity of Japanese shrines referred to as 'Kami'?", "answer": 'True'},
-                {"question": "Are Komainu in shrines regarded as decorations rather than guardians?", "answer": 'False'},
-                {"question": "Is the traditional Japanese festival 'Hatsuha' held on New Year's Day, January 1st?", "answer": 'True'},
-                {"question": "Does the 'Torii' in a shrine symbolize the connection between humans and gods?", "answer": 'True'},
-                {"question": "Are harvest festivals and Shichi-Go-San unrelated to Japanese shrines?", "answer": 'False'},
-                {"question": "Are common offerings in shrines limited to money and flowers?", "answer": 'False'},
+                {"question": "The main deity of a Japanese shrine is referred to as 'Kami'.", "answer": 'True'},
+                {"question": "Komainu in shrines are regarded as decorations rather than guardians.", "answer": 'False'},
+                {"question": "The traditional Japanese festival 'Hatsuha' is held on New Year's Day, January 1st.", "answer": 'True'},
+                {"question": "The 'Torii' in a shrine symbolizes the connection between humans and gods.", "answer": 'True'},
+                {"question": "Harvest festivals and Shichi-Go-San are unrelated to Japanese shrines.", "answer": 'False'},
+                {"question": "Common offerings in shrines are limited to money and flowers.", "answer": 'False'},
             ]
             asked_questions = []
             # Randomly select a question that hasn't been asked
@@ -335,22 +390,11 @@ def main():
 
             if score >= 6:
                 print("Congratulations! You've completed the game.")
-
+                sort_flag = True
             else:
                 print("Game over! Better luck next time.")
             # return to home mode after minigame
             current_mode = "home"
-
-#main():
-# load home map
-# current mode = home
-# player moves
-# if player collides with rect
-# change mode to game
-# await game to play out
-# after game check whether completion flag for each game has been raised
-# if yes, change background to new
-# else pass
 
 if __name__ == '__main__':
     main()
