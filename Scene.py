@@ -6,4 +6,4 @@ class Scene():
         self.resolution = resolution
         # initiate sprite
         self.background = pygame.image.load(image)
-        self.background = pygame.transform.scale(self.background, resolution)
+        # self.background = pygame.transform.scale(self.background, resolution)

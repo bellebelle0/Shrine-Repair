@@ -9,7 +9,7 @@ class Player(pygame.sprite.Sprite):
         self.resolution = resolution
         # initiate sprite
         self.image = pygame.image.load(filepath)
-        self.image = pygame.transform.scale_by(self.image, 0.23)
+        # self.image = pygame.transform.scale_by(self.image, 0.23)
         self.rect = self.image.get_rect() #creates hitbox with image dimensions
         self.rect.center = spawn_point #sprite spawn location
         self.respawn_point = spawn_point

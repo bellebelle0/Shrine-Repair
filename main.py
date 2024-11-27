@@ -32,11 +32,11 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 
 # load all scenes
-home_old = Scene(RESOLUTION, "Draft/home-old.jpg")
-home_new = Scene(RESOLUTION, "Draft/home-new.jpg")
-dance_scene = Scene(RESOLUTION, "Draft/Game1.jpg")
-shop_scene = Scene(RESOLUTION, "Draft/Game2.jpg")
-sorting_scene = Scene(RESOLUTION, "Draft/Game3.jpg")
+home_old = Scene(RESOLUTION, "art/home_old.PNG")
+home_new = Scene(RESOLUTION, "art/home_new.PNG")
+dance_scene = Scene(RESOLUTION, "art/dance_game.PNG")
+shop_scene = Scene(RESOLUTION, "art/shop_game.PNG")
+sorting_scene = Scene(RESOLUTION, "art/sort_game.PNG")
 
 
 #configure display window
@@ -47,10 +47,10 @@ pygame.display.set_caption("Shrine Repair")
 all_sprites = pygame.sprite.Group()
 
 #initiate sprites
-home_player = Player(RESOLUTION, (RESOLUTION[0]/2, 480), [all_sprites], "Draft/player-sprite.png")
-dance_player = Player(RESOLUTION, (0, 255), [all_sprites], "Draft/dance_sprite.png")
-shop_player = Player(RESOLUTION, (320, 400), [all_sprites], "Draft/shop_game_sprite.png")
-sorting_player = Player(RESOLUTION, (320, 450), [all_sprites], "Draft/sorting_game_sprite.jpg")
+home_player = Player(RESOLUTION, (RESOLUTION[0]/2, 480), [all_sprites], "art/home_player.PNG")
+dance_player = Player(RESOLUTION, (0, 275), [all_sprites], "art/dance_player.PNG")
+shop_player = Player(RESOLUTION, (320, 400), [all_sprites], "art/shop_player.PNG")
+sorting_player = Player(RESOLUTION, (320, 450), [all_sprites], "art/sort_player.PNG")
 
 # minigame events
 SCORE_UP = pygame.USEREVENT + 1 # create new user defined event
@@ -188,13 +188,13 @@ def sort_game(current_question, score, question_status):
     # Draw background and score
     display.blit(sorting_scene.background, (0, 0))
     score_text = f"Score: {score}"
-    score_display = small_font.render(score_text, True, RED)
-    display.blit(score_display, (24, 24))
+    score_display = small_font.render(score_text, True, BLACK)
+    display.blit(score_display, (24, 8))
     
     #  question display
     # question_display = small_font.render(current_question["question"], True, BLACK)
     # display.blit(question_display, (24, 60))
-    text_display = pygame.Rect((398*.23,240*.23,1800*.23, 864*.23))
+    text_display = pygame.Rect((120,40,418, 200))
     drawText(display, current_question["question"], BLACK, text_display, small_font)
 
     user_answer = ''
