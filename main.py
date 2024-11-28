@@ -121,9 +121,9 @@ def home_mode():
 def dance_game(score, spotlight, live_spotlight):
     #show score in corner and draw bg
     score_text = f"Score: {score}"
-    score_display = font.render(score_text, True, RED)
+    score_display = small_font.render(score_text, True, WHITE)
     display.blit(dance_scene.background, (0,0))
-    display.blit(score_display, (24, 24))
+    display.blit(score_display, (24, 8))
 
     #variable to hold spotlight status
     spotlight_status = live_spotlight
@@ -161,9 +161,9 @@ def dance_game(score, spotlight, live_spotlight):
 def shop_game(score, item_group):
     #show score in corner and draw bg
     score_text = f"Score: {score}"
-    score_display = font.render(score_text, True, RED)
+    score_display = small_font.render(score_text, True, WHITE)
     display.blit(shop_scene.background, (0,0))
-    display.blit(score_display, (24, 24))
+    display.blit(score_display, (24, 8))
     shop_player.move(5, "shop game")
     
     #for each item created
@@ -188,11 +188,11 @@ def sort_game(current_question, score, question_status):
     # Draw background and score
     display.blit(sorting_scene.background, (0, 0))
     score_text = f"Score: {score}"
-    score_display = small_font.render(score_text, True, BLACK)
+    score_display = small_font.render(score_text, True, WHITE)
     display.blit(score_display, (24, 8))
     
     #  question display
-    # question_display = small_font.render(current_question["question"], True, BLACK)
+    # question_display = small_font.render(current_question["question"], True, WHITE)
     # display.blit(question_display, (24, 60))
     text_display = pygame.Rect((120,40,418, 200))
     drawText(display, current_question["question"], BLACK, text_display, small_font)
