@@ -41,7 +41,7 @@ sorting_scene = Scene(RESOLUTION, "art/sort_game.PNG")
 
 #configure display window
 display = pygame.display.set_mode(RESOLUTION)
-pygame.display.set_caption("Shrine Repair")
+pygame.display.set_caption("Revival of the Shrine")
 
 #initiate sprite groups
 all_sprites = pygame.sprite.Group()
