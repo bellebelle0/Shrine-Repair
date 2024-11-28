@@ -1,6 +1,9 @@
 # Shrine-Repair
 ## Installation
 ```sh
+git clone https://github.com/bellebelle0/Shrine-Repair.git
+```
+```sh
 pip install -r requirements.txt
 ```
 ## Run the game
